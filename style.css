@@ -1,3 +1,10 @@
+
+@font-face {
+    font-family:"authentic" ;
+    src: url(font/authentic-sans-condensed-90.woff2);
+  }
+
+
 body, html {
     height: 100%;
     margin: 0;
@@ -24,4 +31,8 @@ body, html {
     100% {
         transform: translateY(100vh);
     }
+}
+
+h1{
+ font-family: 'authentic';
 }
