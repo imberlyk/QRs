@@ -1,4 +1,4 @@
-// Import scrawl-canvas library
+/* // Import scrawl-canvas library
 import * as scrawl from "https://unpkg.com/scrawl-canvas@8.14.0";
 
 // Confetti functionality
@@ -16,7 +16,7 @@ function startConfetti() {
         document.body.appendChild(confetti);
         confetti.addEventListener('animationend', () => confetti.remove());
     }
-}
+} */
 // Import scrawl-canvas library
 import * as scrawl from "https://unpkg.com/scrawl-canvas@8.14.0";
 
@@ -24,7 +24,7 @@ import * as scrawl from "https://unpkg.com/scrawl-canvas@8.14.0";
 document.addEventListener("DOMContentLoaded", () => {
     const canvas = scrawl.library.canvas.mycanvas; // Get the canvas by id
 
-    // Access the webcam
+    // Request webcam access
     navigator.mediaDevices.getUserMedia({ video: true })
         .then((stream) => {
             // Create a video element to capture the webcam feed
@@ -32,9 +32,23 @@ document.addEventListener("DOMContentLoaded", () => {
             video.srcObject = stream;
             video.play();  // Start the video
 
+            // Append the video to the body (for debugging)
+            document.body.appendChild(video);
+
             // Wait until the video is ready
             video.addEventListener('loadeddata', () => {
-                // Create a scrawl-canvas picture from the video feed
+
+                // Create the dither filter
+                scrawl.makeFilter({
+                    name: 'dither-filter',
+                    method: 'reducePalette',
+                    noiseType: 'ordered', // "random" or "bluenoise" can also be used
+                    palette: 4, // Number of colors to dither (experiment with values)
+                    useLabForPaletteDistance: true, // Use LAB color space for distance calculation
+                    minimumColorDistance: 3000 // Minimum distance between colors
+                });
+
+                // Create a scrawl-canvas picture element from the video feed with the dither effect
                 scrawl.makePicture({
                     name: 'webcam-feed',
                     asset: video, // Use the video element as the asset
@@ -42,10 +56,11 @@ document.addEventListener("DOMContentLoaded", () => {
                     copyDimensions: ['100%', '100%'],
                     start: ['center', 'center'],
                     handle: ['center', 'center'],
-                    method: 'fill' // Fill the canvas with the video feed
+                    method: 'fill', // Fill the canvas with the video feed
+                    filters: ['dither-filter'] // Apply the dither filter
                 });
 
-                // Render the webcam feed continuously onto the canvas
+                // Render the dithered webcam feed continuously onto the canvas
                 scrawl.makeRender({
                     name: 'webcam-render',
                     target: canvas // Target the canvas for rendering
