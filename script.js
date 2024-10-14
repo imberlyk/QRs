@@ -1,3 +1,7 @@
+window.onload = function() {
+  startConfetti();
+};
+
 function startConfetti() {
   for (let i = 0; i < 100; i++) {
       let confetti = document.createElement('div');
