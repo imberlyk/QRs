@@ -12,6 +12,7 @@
             justify-content: center;
             align-items: center;
             background-color: #f0f0f0;
+            overflow: hidden;
         }
 
         canvas {
@@ -28,8 +29,8 @@
 <canvas id="mycanvas" width="640" height="480"></canvas>
 
 <script>
-    // 3x3 Bayer matrix for ordered dithering (you can try different matrices)
-    const bayerMatrix = [
+     // 3x3 Bayer matrix for ordered dithering
+     const bayerMatrix = [
         [0, 128, 32],
         [192, 64, 224],
         [48, 160, 96]
@@ -37,16 +38,29 @@
 
     const matrixSize = 3; // Size of the matrix
 
-    // Request webcam access and handle the feed
-    navigator.mediaDevices.getUserMedia({ video: true })
+    // Adjust canvas size to match screen size
+    const canvas = document.getElementById('mycanvas');
+    const ctx = canvas.getContext('2d');
+
+    function resizeCanvas() {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+    }
+    resizeCanvas();
+    window.addEventListener('resize', resizeCanvas);
+
+    // Request webcam access (front or rear camera for mobile)
+    const constraints = {
+        video: {
+            facingMode: 'environment' // Change to 'user' for front-facing camera
+        }
+    };
+
+    navigator.mediaDevices.getUserMedia(constraints)
         .then((stream) => {
             const video = document.createElement('video');
             video.srcObject = stream;
-            video.play();  // Play the video stream
-
-            // Get the canvas context for drawing
-            const canvas = document.getElementById('mycanvas');
-            const ctx = canvas.getContext('2d');
+            video.play();
 
             // Function to apply ordered dither effect
             function applyDitherEffect() {
@@ -86,7 +100,7 @@
             // Loop to apply the dither effect continuously
             function renderLoop() {
                 applyDitherEffect();
-                requestAnimationFrame(renderLoop); // Recursively call the render loop
+                requestAnimationFrame(renderLoop);
             }
 
             // Start the render loop
@@ -94,7 +108,7 @@
         })
         .catch((error) => {
             console.error('Webcam access error:', error);
-            alert('Error accessing the webcam: ' + error.message);
+            alert('Error accessing the camera: ' + error.message);
         });
 </script>
 
