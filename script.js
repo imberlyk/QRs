@@ -13,51 +13,40 @@ function startConfetti() {
       confetti.addEventListener('animationend', () => confetti.remove());
   }
 }
+<script type="module">
+    import * as scrawl from "https://unpkg.com/scrawl-canvas@8.14.0";
 
-import * as scrawl from "https://unpkg.com/scrawl-canvas@8.14.0";
+    // Ensure the DOM is loaded
+    document.addEventListener("DOMContentLoaded", () => {
+        const canvas = scrawl.library.canvas.mycanvas; // Get canvas by id
 
-const canvas = scrawl.findCanvas("mycanvas");
+        scrawl.makeFilter({
+            name: "reduce-filter",
+            method: "reducePalette",
+            noiseType: "ordered", // Set the noise type
+        });
 
-scrawl.makeFilter({
-  name: "reduce-filter",
-  method: "reducePalette",
+        // Initialize Media Stream
+        scrawl.importMediaStream({
+            audio: false,
+            width: 500,
+            height: 500
+        }).then((myface) => {
+            scrawl.makePicture({
+                name: "camera-picture",
+                asset: myface.name,
+                dimensions: ["100%", "100%"],
+                copyDimensions: ["100%", "100%"],
+                start: ["center", "center"],
+                handle: ["center", "center"],
+                flipReverse: true,
+                method: "fill",
+                filters: ["reduce-filter"]
+            });
+        }).catch((err) => console.log(err.message));
 
-  /* Filter supports "random", "ordered" and "bluenoise" values. Uncomment the noiseType attribute below to see effect */
-  // noiseType: 'random',
-  noiseType: "ordered"
-  // noiseType: 'bluenoise',
-
-  /* Attributes to create a "commonrst color" dither - warning: very slow! */
-  // palette: 4,
-  // useLabForPaletteDistance: false,
-  // minimumColorDistance: 4000,
-});
-
-scrawl
-  .importMediaStream({
-    audio: false,
-    width: 500,
-    height: 500
-  })
-  .then((myface) => {
-    scrawl.makePicture({
-      name: "camera-picture",
-      asset: myface.name,
-
-      dimensions: ["100%", "100%"],
-      copyDimensions: ["100%", "100%"],
-      start: ["center", "center"],
-      handle: ["center", "center"],
-      flipReverse: true,
-
-      method: "fill",
-
-      filters: ["reduce-filter"]
+        scrawl.makeRender({
+            name: "demo-animation",
+            target: canvas
+        });
     });
-  })
-  .catch((err) => console.log(err.message));
-
-scrawl.makeRender({
-  name: "demo-animation",
-  target: canvas
-});
