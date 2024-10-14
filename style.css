@@ -35,4 +35,6 @@ body, html {
 
 h1{
  font-family: 'authentic';
+ font-size: 2vw;
+ padding: 20px;
 }
