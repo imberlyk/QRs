@@ -5,6 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Device Orientation Squares</title>
     <style>
+
+@font-face {
+    font-family:"authentic" ;
+    src: url(font/authentic-sans-condensed-90.woff2);
+  }
         body {
           margin: 0;
           overflow: hidden;
@@ -21,6 +26,7 @@
           color: white;
           left: 10px;
           font-family: Arial, sans-serif;
+          z-index: 10; /* Ensure info text stays above canvas */
         }
         #request-button {
           padding: 10px 20px;
@@ -34,11 +40,13 @@
           left: 50%;
           top: 50%;
           transform: translate(-50%, -50%);
+          z-index: 10; /* Ensure button stays above canvas */
         }
         canvas {
           position: absolute;
           left: 0;
           top: 0;
+          z-index: -1; /* Ensure canvas stays behind everything */
         }
     </style>
 </head>
@@ -51,7 +59,7 @@
     <br>alpha(z): <span id='alpha'> </span><sup>°</sup>
 </div>
 
-<button id="request-button">Enable Device Orientation</button>
+<button id="request-button">Click & Move your Phone</button>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.17.1/matter.min.js"></script>
 <script>
@@ -126,7 +134,7 @@
 
     // Create 15 small black squares
     var squares = [];
-    for (let i = 0; i < 25; i++) {
+    for (let i = 0; i < 75; i++) {
         let square = Bodies.rectangle(100 + i * 50, 100, 30, 30, {
             render: {
                 fillStyle: 'black',
@@ -137,7 +145,7 @@
     }
 
     // Create 10 white squares with black border
-    for (let i = 0; i < 21; i++) {
+    for (let i = 0; i < 51; i++) {
         let whiteSquare = Bodies.rectangle(100 + i * 50, 300, 30, 30, {
             render: {
                 fillStyle: 'white',
