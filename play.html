@@ -1,63 +1,79 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Device Orientation Squares</title>
+    <meta charset="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Device Orientation with Permission</title>
     <style>
         body {
           margin: 0;
           overflow: hidden;
           background-color: white;
           color: black;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          height: 100vh;
         }
-        canvas {
+        #info {
           position: absolute;
-          left: 0;
-          top: 0;
-          z-index: -1;
+          top: 10px;
+          left: 10px;
+          font-family: Arial, sans-serif;
         }
     </style>
 </head>
 <body>
 
-    <p>Rotate your device to move the squares:</p>
-    gamma(x):<a id='gamma'> </a><sup>o</sup><br>
-    beta(y):<a id='beta'> </a><sup>o</sup><br>
-    alpha(z):<a id='alpha'> </a><sup>o</sup><br>
+<div id="info">
+    Rotate your device to move the squares:
+    <br>gamma(x): <span id='gamma'> </span><sup>°</sup>
+    <br>beta(y): <span id='beta'> </span><sup>°</sup>
+    <br>alpha(z): <span id='alpha'> </span><sup>°</sup>
+</div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.17.1/matter.min.js"></script>
 <script>
-    // Request device orientation permission for iOS 13+
+    // Request device orientation permission for iOS 13+ and ensure proper handling
     function requestOrientationPermission() {
         if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
+            // iOS 13+ specific handling
             DeviceOrientationEvent.requestPermission()
                 .then(permissionState => {
                     if (permissionState === 'granted') {
                         window.addEventListener('deviceorientation', handleOrientation);
+                    } else {
+                        alert("Permission to access device orientation was denied.");
                     }
                 })
-                .catch(console.error);
+                .catch(() => {
+                    alert("Failed to request permission for device orientation.");
+                });
         } else {
+            // Other devices
             window.addEventListener('deviceorientation', handleOrientation);
         }
     }
 
     // Device orientation handler
     function handleOrientation(event) {
-      var x = event.gamma; // In degrees [-90,90]
-      var y = event.beta;  // In degrees [-180,180]
-      var z = event.alpha; // In degrees [0,360]
-    
-      // Display orientation values
-      document.getElementById("gamma").innerHTML = Math.round(x);
-      document.getElementById("beta").innerHTML = Math.round(y);
-      document.getElementById("alpha").innerHTML = Math.round(z);
+        if (!event.gamma || !event.beta || !event.alpha) {
+            alert("Device orientation not supported.");
+            return;
+        }
 
-      // Update gravity based on device orientation
-      const scale = 0.005; // Adjust gravity sensitivity
-      engine.world.gravity.x = x * scale; // Set gravity based on tilt (gamma)
-      engine.world.gravity.y = y * scale; // Set gravity based on tilt (beta)
+        var x = event.gamma; // In degrees [-90,90]
+        var y = event.beta;  // In degrees [-180,180]
+        var z = event.alpha; // In degrees [0,360]
+    
+        // Display orientation values
+        document.getElementById("gamma").innerHTML = Math.round(x);
+        document.getElementById("beta").innerHTML = Math.round(y);
+        document.getElementById("alpha").innerHTML = Math.round(z);
+
+        // Update gravity based on device orientation
+        const scale = 0.005; // Adjust gravity sensitivity
+        engine.world.gravity.x = x * scale; // Set gravity based on tilt (gamma)
+        engine.world.gravity.y = y * scale; // Set gravity based on tilt (beta)
     }
 
     // Matter.js aliases
@@ -71,15 +87,15 @@
 
     // Set up canvas render
     var render = Render.create({
-      element: document.body,
-      engine: engine,
-      canvas: document.createElement('canvas'),
-      options: {
-        width: window.innerWidth,
-        height: window.innerHeight,
-        wireframes: false, // show solid shapes
-        background: 'transparent' // transparent background
-      }
+        element: document.body,
+        engine: engine,
+        canvas: document.createElement('canvas'),
+        options: {
+            width: window.innerWidth,
+            height: window.innerHeight,
+            wireframes: false, // show solid shapes
+            background: 'transparent' // transparent background
+        }
     });
     
     Render.run(render);
@@ -88,29 +104,29 @@
     var squares = [];
     for (let i = 0; i < 7; i++) {
         let square = Bodies.rectangle(100 + i * 60, 100, 30, 30, {
-          render: {
-            fillStyle: 'black',
-            strokeStyle: 'black'
-          }
+            render: {
+                fillStyle: 'black',
+                strokeStyle: 'black'
+            }
         });
         squares.push(square);
     }
 
     // Create static walls to keep the squares on screen
     var wallSettings = {
-      isStatic: true,
-      render: {
-        fillStyle: 'black',
-        strokeStyle: 'black'
-      }
+        isStatic: true,
+        render: {
+            fillStyle: 'black',
+            strokeStyle: 'black'
+        }
     };
 
     World.add(engine.world, [
-      ...squares,
-      Bodies.rectangle(window.innerWidth / 2, -50, window.innerWidth, 100, wallSettings), // Top wall
-      Bodies.rectangle(window.innerWidth / 2, window.innerHeight + 50, window.innerWidth, 100, wallSettings), // Bottom wall
-      Bodies.rectangle(-50, window.innerHeight / 2, 100, window.innerHeight, wallSettings), // Left wall
-      Bodies.rectangle(window.innerWidth + 50, window.innerHeight / 2, 100, window.innerHeight, wallSettings) // Right wall
+        ...squares,
+        Bodies.rectangle(window.innerWidth / 2, -50, window.innerWidth, 100, wallSettings), // Top wall
+        Bodies.rectangle(window.innerWidth / 2, window.innerHeight + 50, window.innerWidth, 100, wallSettings), // Bottom wall
+        Bodies.rectangle(-50, window.innerHeight / 2, 100, window.innerHeight, wallSettings), // Left wall
+        Bodies.rectangle(window.innerWidth + 50, window.innerHeight / 2, 100, window.innerHeight, wallSettings) // Right wall
     ]);
 
     // Run the engine
@@ -118,28 +134,15 @@
 
     // Resize canvas on window resize
     window.addEventListener('resize', function() {
-      render.canvas.width = window.innerWidth;
-      render.canvas.height = window.innerHeight;
-      Render.lookAt(render, {
-        min: { x: 0, y: 0 },
-        max: { x: window.innerWidth, y: window.innerHeight }
-      });
+        render.canvas.width = window.innerWidth;
+        render.canvas.height = window.innerHeight;
+        Render.lookAt(render, {
+            min: { x: 0, y: 0 },
+            max: { x: window.innerWidth, y: window.innerHeight }
+        });
     });
 
-    // Move a square to the mouse position on click
-    function getMousePos(canvas, evt) {
-      var rect = canvas.getBoundingClientRect();
-      return {
-        x: evt.clientX - rect.left,
-        y: evt.clientY - rect.top
-      };
-    }
-
-    render.canvas.addEventListener('mousedown', function(evt) {
-      Matter.Body.setPosition(squares[0], getMousePos(render.canvas, evt)); // Moves only the first square for demo
-    }, false);
-
-    // Request device orientation permission on button click
+    // Start the permission request process
     requestOrientationPermission();
 </script>
 
