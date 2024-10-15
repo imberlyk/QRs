@@ -1,8 +1,9 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Device Orientation with Permission</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Device Orientation with Button Permission</title>
     <style>
         body {
           margin: 0;
@@ -20,6 +21,15 @@
           left: 10px;
           font-family: Arial, sans-serif;
         }
+        #request-button {
+          padding: 10px 20px;
+          font-size: 16px;
+          cursor: pointer;
+          background-color: black;
+          color: white;
+          border: none;
+          border-radius: 5px;
+        }
     </style>
 </head>
 <body>
@@ -31,16 +41,19 @@
     <br>alpha(z): <span id='alpha'> </span><sup>°</sup>
 </div>
 
+<button id="request-button">Enable Device Orientation</button>
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.17.1/matter.min.js"></script>
 <script>
-    // Request device orientation permission for iOS 13+ and ensure proper handling
-    function requestOrientationPermission() {
+    // Request device orientation permission on button click
+    document.getElementById('request-button').addEventListener('click', function() {
         if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
             // iOS 13+ specific handling
             DeviceOrientationEvent.requestPermission()
                 .then(permissionState => {
                     if (permissionState === 'granted') {
                         window.addEventListener('deviceorientation', handleOrientation);
+                        document.getElementById('request-button').style.display = 'none'; // Hide button on success
                     } else {
                         alert("Permission to access device orientation was denied.");
                     }
@@ -51,8 +64,9 @@
         } else {
             // Other devices
             window.addEventListener('deviceorientation', handleOrientation);
+            document.getElementById('request-button').style.display = 'none'; // Hide button for non-iOS devices
         }
-    }
+    });
 
     // Device orientation handler
     function handleOrientation(event) {
@@ -141,9 +155,6 @@
             max: { x: window.innerWidth, y: window.innerHeight }
         });
     });
-
-    // Start the permission request process
-    requestOrientationPermission();
 </script>
 
 </body>
