@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Visitor Counter</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f0f0f0;
+            margin: 0;
+        }
+        h1 {
+            font-size: 3rem;
+        }
+        span {
+            color: #3498db;
+        }
+    </style>
+</head>
+<body>
+    <h1>Visitor Count: <span id="count">0</span></h1>
+
+    <script>
+        const namespace = 'qrcodesarethecoolest'; // Replace with your unique namespace
+
+        // First, try to get the current count to check if the API is working
+        fetch(`https://api.countapi.xyz/get/${namespace}/visits`)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok: ' + response.statusText);
+            }
+            return response.json();
+        })
+        .then(data => {
+            document.getElementById('count').innerText = data.value;
+            console.log("Current visitor count:", data.value);
+
+            // Now, increment the counter
+            fetch(`https://api.countapi.xyz/hit/${namespace}/visits`)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Error incrementing the count: ' + response.statusText);
+                }
+                return response.json();
+            })
+            .then(data => {
+                document.getElementById('count').innerText = data.value;
+                console.log("Updated visitor count after incrementing:", data.value);
+            })
+            .catch(error => {
+                console.error('Error incrementing the visitor count:', error);
+            });
+        })
+        .catch(error => {
+            console.error('Error fetching the visitor count:', error);
+            document.getElementById('count').innerText = 'Error!';
+        });
+    </script>
+</body>
+</html>
