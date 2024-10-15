@@ -86,7 +86,7 @@
                         const threshold = bayerMatrix[y % matrixSize][x % matrixSize];
 
                         // Map brightness to black or white based on Bayer matrix threshold
-                        const color = brightness > threshold ? 0 : 255;
+                        const color = brightness > threshold ? 255 : 0;
 
                         // Set the pixel color to either black or white
                         data[index] = data[index + 1] = data[index + 2] = color;
