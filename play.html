@@ -132,10 +132,12 @@
     
     Render.run(render);
 
-    // Create 15 small black squares
+    // Create 75 small black squares, spaced out to avoid overlaps
     var squares = [];
     for (let i = 0; i < 75; i++) {
-        let square = Bodies.rectangle(100 + i * 50, 100, 30, 30, {
+        let x = 50 + (i % 15) * 50;  // Distribute them horizontally
+        let y = 100 + Math.floor(i / 15) * 50; // Distribute them vertically
+        let square = Bodies.rectangle(x, y, 30, 30, {
             render: {
                 fillStyle: 'black',
                 strokeStyle: 'black'
@@ -144,9 +146,11 @@
         squares.push(square);
     }
 
-    // Create 10 white squares with black border
+    // Create 61 white squares with black border, spaced out to avoid overlaps
     for (let i = 0; i < 61; i++) {
-        let whiteSquare = Bodies.rectangle(100 + i * 50, 300, 30, 30, {
+        let x = 50 + (i % 15) * 50;  // Distribute them horizontally
+        let y = 500 + Math.floor(i / 15) * 50; // Distribute them vertically below the black squares
+        let whiteSquare = Bodies.rectangle(x, y, 30, 30, {
             render: {
                 fillStyle: 'white',
                 lineWidth: 5,
