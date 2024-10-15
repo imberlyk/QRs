@@ -103,7 +103,7 @@
         document.getElementById("alpha").innerHTML = Math.round(z);
 
         // Update gravity based on device orientation
-        const scale = 0.005; // Adjust gravity sensitivity
+        const scale = 0.015; // Adjust gravity sensitivity
         engine.world.gravity.x = x * scale; // Set gravity based on tilt (gamma)
         engine.world.gravity.y = y * scale; // Set gravity based on tilt (beta)
     }
