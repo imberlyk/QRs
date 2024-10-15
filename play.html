@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>QR CODES</title>
+    <title>Device Orientation Squares</title>
     <style>
         body {
           margin: 0;
@@ -21,7 +21,7 @@
 </head>
 <body>
 
-    <p>Rotate your device:</p>
+    <p>Rotate your device to move the squares:</p>
     gamma(x):<a id='gamma'> </a><sup>o</sup><br>
     beta(y):<a id='beta'> </a><sup>o</sup><br>
     alpha(z):<a id='alpha'> </a><sup>o</sup><br>
@@ -55,7 +55,7 @@
       document.getElementById("alpha").innerHTML = Math.round(z);
 
       // Update gravity based on device orientation
-      const scale = 0.001; // Adjust gravity sensitivity
+      const scale = 0.005; // Adjust gravity sensitivity
       engine.world.gravity.x = x * scale; // Set gravity based on tilt (gamma)
       engine.world.gravity.y = y * scale; // Set gravity based on tilt (beta)
     }
@@ -84,15 +84,19 @@
     
     Render.run(render);
 
-    // Create a black square
-    var square = Bodies.rectangle(200, 300, 50, 50, {
-      render: {
-        fillStyle: 'black',
-        strokeStyle: 'black'
-      }
-    });
+    // Create 7 small black squares
+    var squares = [];
+    for (let i = 0; i < 7; i++) {
+        let square = Bodies.rectangle(100 + i * 60, 100, 30, 30, {
+          render: {
+            fillStyle: 'black',
+            strokeStyle: 'black'
+          }
+        });
+        squares.push(square);
+    }
 
-    // Create static walls to keep the square on screen
+    // Create static walls to keep the squares on screen
     var wallSettings = {
       isStatic: true,
       render: {
@@ -102,7 +106,7 @@
     };
 
     World.add(engine.world, [
-      square,
+      ...squares,
       Bodies.rectangle(window.innerWidth / 2, -50, window.innerWidth, 100, wallSettings), // Top wall
       Bodies.rectangle(window.innerWidth / 2, window.innerHeight + 50, window.innerWidth, 100, wallSettings), // Bottom wall
       Bodies.rectangle(-50, window.innerHeight / 2, 100, window.innerHeight, wallSettings), // Left wall
@@ -122,7 +126,7 @@
       });
     });
 
-    // Move the square to the mouse position on click
+    // Move a square to the mouse position on click
     function getMousePos(canvas, evt) {
       var rect = canvas.getBoundingClientRect();
       return {
@@ -132,7 +136,7 @@
     }
 
     render.canvas.addEventListener('mousedown', function(evt) {
-      Matter.Body.setPosition(square, getMousePos(render.canvas, evt));
+      Matter.Body.setPosition(squares[0], getMousePos(render.canvas, evt)); // Moves only the first square for demo
     }, false);
 
     // Request device orientation permission on button click
