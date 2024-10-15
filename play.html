@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Device Orientation with Button Permission</title>
+    <title>Device Orientation Squares</title>
     <style>
         body {
           margin: 0;
@@ -29,6 +29,15 @@
           color: white;
           border: none;
           border-radius: 5px;
+          position: absolute;
+          left: 50%;
+          top: 50%;
+          transform: translate(-50%, -50%);
+        }
+        canvas {
+          position: absolute;
+          left: 0;
+          top: 0;
         }
     </style>
 </head>
@@ -114,16 +123,28 @@
     
     Render.run(render);
 
-    // Create 7 small black squares
+    // Create 15 small black squares
     var squares = [];
-    for (let i = 0; i < 7; i++) {
-        let square = Bodies.rectangle(100 + i * 60, 100, 30, 30, {
+    for (let i = 0; i < 15; i++) {
+        let square = Bodies.rectangle(100 + i * 50, 100, 30, 30, {
             render: {
                 fillStyle: 'black',
                 strokeStyle: 'black'
             }
         });
         squares.push(square);
+    }
+
+    // Create 10 white squares with black border
+    for (let i = 0; i < 10; i++) {
+        let whiteSquare = Bodies.rectangle(100 + i * 50, 300, 30, 30, {
+            render: {
+                fillStyle: 'white',
+                lineWidth: 5,
+                strokeStyle: 'black'
+            }
+        });
+        squares.push(whiteSquare);
     }
 
     // Create static walls to keep the squares on screen
