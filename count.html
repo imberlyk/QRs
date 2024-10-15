@@ -21,6 +21,7 @@
         h1 {
             font-size: 2rem;
             font-family: "authentic";
+            padding: 5px;
         }
         span {
             color: #000000;
@@ -31,12 +32,16 @@
     <h1>QR CODE SCANNED BY: <span id="count">Fetching...</span></h1>
 
     <script>
-        // Use the Simple Analytics API to get the visitor count
-        fetch('https://api.simpleanalytics.com/quick-stats?domain=imberlyk.github.io')
+        // Use CountAPI to get and increment the visitor count
+        const namespace = 'imberlyk.github.io';
+        const key = 'visits';
+
+        // Fetch the current visitor count and increment it
+        fetch(`https://api.countapi.xyz/hit/${namespace}/${key}`)
         .then(response => response.json())
         .then(data => {
-            document.getElementById('count').innerText = data.visits;
-            console.log("Current visitor count:", data.visits);
+            document.getElementById('count').innerText = data.value;
+            console.log("Updated visitor count:", data.value);
         })
         .catch(error => console.error('Error fetching the visitor count:', error));
     </script>
