@@ -6,10 +6,10 @@
     <title>QR CODES</title>
     <style>
         body {
-          background-color: white;
-          color: black;
           margin: 0;
           overflow: hidden;
+          background-color: white;
+          color: black;
         }
         canvas {
           position: absolute;
@@ -26,6 +26,7 @@
     beta(y):<a id='beta'> </a><sup>o</sup><br>
     alpha(z):<a id='alpha'> </a><sup>o</sup><br>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.17.1/matter.min.js"></script>
 <script>
     // Device orientation handler
     function handleOrientation(event) {
@@ -48,11 +49,27 @@
 
     // Matter.js aliases
     var Engine = Matter.Engine,
+        Render = Matter.Render,
         World = Matter.World,
         Bodies = Matter.Bodies;
 
     // Create the Matter.js engine
     var engine = Engine.create();
+
+    // Set up canvas render
+    var render = Render.create({
+      element: document.body,
+      engine: engine,
+      canvas: document.createElement('canvas'),
+      options: {
+        width: window.innerWidth,
+        height: window.innerHeight,
+        wireframes: false, // show solid shapes
+        background: 'transparent' // transparent background
+      }
+    });
+    
+    Render.run(render);
 
     // Create a black square
     var square = Bodies.rectangle(200, 300, 50, 50, {
@@ -64,56 +81,35 @@
 
     // Create static walls to keep the square on screen
     var wallSettings = {
-      size: 2000,
       isStatic: true,
       render: {
         fillStyle: 'black',
         strokeStyle: 'black'
       }
     };
+
     World.add(engine.world, [
       square,
-      Bodies.rectangle(window.innerWidth / 2, -wallSettings.size / 2, window.innerWidth, wallSettings.size, wallSettings), // Top wall
-      Bodies.rectangle(window.innerWidth / 2, window.innerHeight + wallSettings.size / 2, window.innerWidth, wallSettings.size, wallSettings), // Bottom wall
-      Bodies.rectangle(-wallSettings.size / 2, window.innerHeight / 2, wallSettings.size, window.innerHeight, wallSettings), // Left wall
-      Bodies.rectangle(window.innerWidth + wallSettings.size / 2, window.innerHeight / 2, wallSettings.size, window.innerHeight, wallSettings) // Right wall
+      Bodies.rectangle(window.innerWidth / 2, -50, window.innerWidth, 100, wallSettings), // Top wall
+      Bodies.rectangle(window.innerWidth / 2, window.innerHeight + 50, window.innerWidth, 100, wallSettings), // Bottom wall
+      Bodies.rectangle(-50, window.innerHeight / 2, 100, window.innerHeight, wallSettings), // Left wall
+      Bodies.rectangle(window.innerWidth + 50, window.innerHeight / 2, 100, window.innerHeight, wallSettings) // Right wall
     ]);
 
     // Run the engine
     Engine.run(engine);
 
-    // Render
-    var canvas = document.createElement('canvas'),
-        ctx = canvas.getContext('2d');
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
-    document.body.appendChild(canvas);
+    // Resize canvas on window resize
+    window.addEventListener('resize', function() {
+      render.canvas.width = window.innerWidth;
+      render.canvas.height = window.innerHeight;
+      Render.lookAt(render, {
+        min: { x: 0, y: 0 },
+        max: { x: window.innerWidth, y: window.innerHeight }
+      });
+    });
 
-    window.onresize = function() {
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
-    };
-
-    (function render() {
-      var bodies = Matter.Composite.allBodies(engine.world);
-      window.requestAnimationFrame(render);
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-      // Render the square
-      for (var i = 0; i < bodies.length; i++) {
-        var vertices = bodies[i].vertices;
-        ctx.beginPath();
-        ctx.moveTo(vertices[0].x, vertices[0].y);
-        for (var j = 1; j < vertices.length; j++) {
-          ctx.lineTo(vertices[j].x, vertices[j].y);
-        }
-        ctx.closePath();
-        ctx.fillStyle = bodies[i].render.fillStyle;
-        ctx.fill();
-      }
-    })();
-
-    // Move the square to mouse position on click
+    // Move the square to the mouse position on click
     function getMousePos(canvas, evt) {
       var rect = canvas.getBoundingClientRect();
       return {
@@ -122,8 +118,8 @@
       };
     }
 
-    canvas.addEventListener('mousedown', function(evt) {
-      Matter.Body.setPosition(square, getMousePos(canvas, evt));
+    render.canvas.addEventListener('mousedown', function(evt) {
+      Matter.Body.setPosition(square, getMousePos(render.canvas, evt));
     }, false);
 </script>
 
